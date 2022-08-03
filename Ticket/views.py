@@ -85,61 +85,6 @@ def raiseTicket(request):
 
 
 
-@login_required(login_url='/login/')
-def viewRaiseTicket(request, id):
-    print('hello111111')
-    user = request.user
-    admin_list = []
-    users = UserProfile.objects.filter(is_admin = True)
-    try:
-        isadmin = UserProfile.objects.get(is_admin = True, email=request.user.email)
-        isadmin = isadmin.is_admin
-    except Exception as e:
-        isadmin = False
-        print(e)
-    for admin in users:
-        admin_list.append(admin.id)
-    msg = ""
-    subject=RaiseTicket.objects.filter(subject='subject')
-
-    ticket = RaiseTicket.objects.get(id=id)
-
-    admin_user = request.user.is_admin = True
-    print(admin_user,8888)
-    try:
-        myComment = Comment.objects.filter(Q(user=ticket.assign_to.id) |Q(user=ticket.user.id) | Q(user__in=admin_list), ticket = ticket.id)
-    except:
-        myComment = Comment.objects.filter(Q(user=ticket.user.id) | Q(user__in=admin_list), ticket = ticket.id)
-
-    allusers = UserProfile.objects.all()
-
-    if request.method == "POST" and  "assignForm":
-        print('m duguguu')
-        assign_to = request.POST.get('assign_to')
-        
-            
-        aa=UserProfile.objects.get(id=assign_to)
-        name=aa.name
-        myTicket = RaiseTicket.objects.filter(user=request.user, is_active=True)
-        msg_html12 = loader.render_to_string("assign_mail.html",{'user': user, 'msg': msg,'myTicket':myTicket,'ticket': ticket,'name':name })
-        try:
-            if assign_to:
-                assigned_at = datetime.now()
-                RaiseTicket.objects.filter(id=id).update(assign_to=assign_to, assigned_date=assigned_at)
-                # msg_html = loader.render_to_string("assign_mail.html",{'user': user, 'msg': msg,'myTicket':myTicket,'ticket': ticket,'name':name })
-                # send_mail('Assign Ticket ',"Dear " + name,'no-reply@tech58.in',[UserProfile.objects.get(id=assign_to)],html_message=msg_html,fail_silently=False)
-            
-                
-        except Exception as e:
-            print(e)
-                
-    #25 march changes###
-        return HttpResponseRedirect('/')    
-
-#25 march changes###
-
-    return render(request, 'web/jinja2/ticket_raise/viewRaiseTicket.html.j2', {'comments':myComment, 'user': user, 'ticket': ticket, 
-    'allusers': allusers,'STATUS_TYPE':STATUS_TYPE,'users':isadmin})
 
 @login_required(login_url='/login/')
 def status1(request):
